@@ -1,0 +1,145 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>글 상세</title>
+<link rel="stylesheet" th:href="@{/css/board.css}" />
+</head>
+<div>
+	<body>
+		<div class="title">
+			<h1>게시글 상세</h1>
+		</div>
+		<div class="content">
+			<form th:action="@{/board/updateBoardProc}" method="post">
+				<input name="seq" type="hidden" th:value="${board.seq }" />
+				<table class="getBoard">
+					<colgroup>
+						<col width="30%">
+						<col width="70%">
+					</colgroup>
+					<tr>
+						<td width="70">제목</td>
+						<td class="alignLeft"><input name="title" type="text"
+							th:value="${board.title}" /></td>
+					</tr>
+
+					<tr>
+						<td width="70">카테고리</td>
+						<td class="alignLeft" th:text="${board.category}">
+						<select name="searchCondition">
+								<option value="notice">공지</option>
+								<option value="free">자유</option>
+								<option value="else">기타</option>
+						</select>
+						</td>
+					</tr>
+
+					<tr>
+						<td>작성자</td>
+						<td class="alignLeft" th:text="${board.member.name}"></td>
+					</tr>
+					<tr>
+						<td>내용</td>
+						<td align="left">
+							<textarea name="content" cols="40" rows="10"
+								th:text="${board.content}">
+							</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>등록일</td>
+						<td align="left" th:text="${board.createDate}"
+							pattern="yyyy-MM-dd"></td>
+					</tr>
+					<tr>
+						<td>조회수</td>
+						<td align="left" th:text="${board.cnt}"></td>
+					</tr>
+					<tr>
+						<td colspan="2" class="alignCenter"><input type="submit"
+							value="글 수정" /></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div>
+			<a th:href="@{/board/insertBoard}">글등록</a>&nbsp;&nbsp;&nbsp; <a
+				th:if="@{session['member'].role=='ROLE_ADMIN'}"
+				th:href="@{/board/deleteBoard(seq=${board.seq})}">글삭제</a> <a
+				th:href="@{/board/listBoard}">글목록</a>
+		</div>
+
+<!-- 이미지 -->
+		<div th:each="imageFile : ${board.fileList} ">
+			<a 
+				th:href="@{/images/deleteFile(fileSeq=${imageFile.fileSeq},seq=${board.seq})}"
+				th:text="x"> 
+			</a>
+			 
+			<img th:src="|/images/${imageFile.fileSeq}|" width="150" height="150">
+			<p th:text="${imageFile.fileName}"></p>
+		</div>
+
+		<div  th:each="file : ${board.fileList}">
+			<a th:href="|/attach/${file.fileSeq}|" th:text="${file.fileName}"></a>
+		</div>
+
+		<!-- 댓글 -->
+		<div>
+			<form th:action="@{/reply/insertReply(board=${board.seq})}"
+				method="post">
+
+				<table border="1">
+					<tr>
+						<td colspan="2">
+							<!-- 댓글목록 -->
+							<table>
+								<tr>
+									<th>| 댓글 |<a></a>
+									</th>
+									<th>| 작성자</th>
+									<th>| 작성날짜 |</th>
+								</tr>
+								<tr th:each="reply, state : ${board.replyList}">
+									<td th:text="${reply.recontent}"></td>
+									<td th:text="${reply.replyer}"></td>
+									<td th:text="${#dates.format(reply.replydate,'yyyy-MM-dd')}"></td>
+									<td><a th:if="${reply.replyer}==${member.id} "
+										th:href="@{/reply/deleteReply(rno=${reply.rno})}">|삭제|</a></td>
+									<td><a
+										th:if="${member.role.toString().equals('ROLE_ADMIN')}"
+										th:href="@{/reply/deleteReply(rno=${reply.rno})}">|관리자 삭제|</a></td>
+								</tr>
+							</table>
+
+						</td>
+					</tr>
+					<tr>
+						<td><input type="text" name="recontent" size="50" /></td>
+						<td><input type="button" value="댓글등록"
+							onclick="this.form.submit()" /></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		
+		<!-- 메일 전송 -->
+<div style="margin-top: 10px">
+   <form th:action="@{/mail}" method="post">
+        <input type="hidden" name="seq" th:value="${board.seq}" >
+        <input name="to" placeholder="이메일 주소"> <br>
+        <input type="hidden" name="subject" th:value="${board.title}" >
+        <input type="hidden" name="content" th:value="${board.content}" >
+        <div th:each="imageFile : ${board.fileList}">
+               <input th:if="${imageFile.board.seq} == ${board.seq}" type="hidden" name="filePath" th:value="${imageFile.uploadPath}">
+            </div>
+        <button style="margin-top: 10px">발송</button>
+    </form>
+</div>
+
+
+
+	</body>
+</div>
+</html>

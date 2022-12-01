@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf/org">
+<head>
+<meta charset="UTF-8">
+<title>Login Page</title>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="title">
+			<h1>로그인 성공 페이지</h1>
+		</div>
+		<div class="content">
+			<p><a th:href="@{/}">Index 페이지로 이동</a></p>
+			<p> <a th:href="@{/member}">Member 페이지로 이동</a> </p>
+			<p><a th:href="@{/manager}">Manager페이지로 이동</a></p>
+			<p><a th:href="@{/admin}">Admin 페이지로 이동</a></p>
+		</div>
+	</div>
+</body>
+</html>
